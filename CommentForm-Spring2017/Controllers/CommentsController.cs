@@ -27,12 +27,21 @@ namespace CommentForm_Spring2017.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Comment comment = db.Comments.Find(id);
-            if (comment == null)
+            Comment originalComment = db.Comments.Find(id);
+            if (originalComment == null)
             {
                 return HttpNotFound();
             }
-            return View(comment);
+
+            var viewModel = new CommentFormViewModel
+            {
+                comment = originalComment,
+                procedure = (from p in db.Procedures
+                             where p.Priority == originalComment.Priority
+                             select p).First()
+            };
+
+            return View(viewModel);
         }
 
         // GET: Comments/Create
